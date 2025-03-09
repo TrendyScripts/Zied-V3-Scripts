@@ -1,0 +1,42 @@
+-- Speed Script (Independent)
+
+getgenv().Speed = {
+    ["Enabled"] = false,
+    ["SpeedValue"] = 70
+}
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local SpeedState = false
+
+-- Speed Button UI
+local SpeedUI = Instance.new("ScreenGui")
+local SpeedButton = Instance.new("TextButton")
+
+SpeedUI.Name = "SpeedScript"
+SpeedUI.Parent = game.CoreGui
+SpeedUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+SpeedButton.Parent = SpeedUI
+SpeedButton.Position = UDim2.new(0.05, 0, 0.4, 0)
+SpeedButton.Size = UDim2.new(0, 120, 0, 50)
+SpeedButton.Text = "SPEED [OFF]"
+SpeedButton.Font = Enum.Font.GothamBold
+SpeedButton.TextSize = 20
+SpeedButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black
+SpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedButton.BorderSizePixel = 2
+SpeedButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+SpeedButton.Active = true
+SpeedButton.Draggable = true
+
+SpeedButton.MouseButton1Click:Connect(function()
+    SpeedState = not SpeedState
+    SpeedButton.Text = SpeedState and "SPEED [ON]" or "SPEED [OFF]"
+    
+    local Character = LocalPlayer.Character
+    if Character and Character:FindFirstChild("Humanoid") then
+        Character.Humanoid.WalkSpeed = SpeedState and Speed.SpeedValue or 16
+    end
+end)
