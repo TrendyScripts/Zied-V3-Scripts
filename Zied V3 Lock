@@ -1,19 +1,20 @@
--- Lock (Target Lock / Aimbot) Script (Independent)
-
-getgenv().Lock = {
-    ["Enabled"] = false,
-    ["Prediction"] = 0.13192,
-    ["HorizontalPrediction"] = 0.13476219,
-    ["VerticalPrediction"] = 0.13712945,
-    ["AimPart"] = "UpperTorso"
-}
+-- Camlock Script
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local CamlockState = false
 local enemy = nil
+
+local function Notify(title, text)
+    StarterGui:SetCore("SendNotification", {
+        Title = title;
+        Text = text;
+        Duration = 2;
+    })
+end
 
 local function FindNearestEnemy()
     local ClosestDistance, ClosestPlayer = math.huge, nil
@@ -25,14 +26,14 @@ local function FindNearestEnemy()
     for _, Player in ipairs(Players:GetPlayers()) do
         if Player ~= LocalPlayer then
             local Character = Player.Character
-            if Character and Character:FindFirstChild(Lock.AimPart) and Character:FindFirstChildOfClass("Humanoid") then
+            if Character and Character:FindFirstChild("UpperTorso") and Character:FindFirstChildOfClass("Humanoid") then
                 local Humanoid = Character:FindFirstChildOfClass("Humanoid")
                 if Humanoid.Health > 0 then
-                    local Position, IsVisible = workspace.CurrentCamera:WorldToViewportPoint(Character[Lock.AimPart].Position)
+                    local Position, IsVisible = workspace.CurrentCamera:WorldToViewportPoint(Character.UpperTorso.Position)
                     if IsVisible then
                         local Distance = (CenterPosition - Vector2.new(Position.X, Position.Y)).Magnitude
                         if Distance < ClosestDistance then
-                            ClosestPlayer = Character[Lock.AimPart]
+                            ClosestPlayer = Character.UpperTorso
                             ClosestDistance = Distance
                         end
                     end
@@ -43,21 +44,32 @@ local function FindNearestEnemy()
     return ClosestPlayer
 end
 
--- Lock Button UI
-local LockUI = Instance.new("ScreenGui")
+RunService.Heartbeat:Connect(function()
+    if CamlockState and enemy then
+        local camera = workspace.CurrentCamera
+        camera.CFrame = CFrame.new(camera.CFrame.p, enemy.Position + Vector3.new(
+            enemy.Velocity.X * 0.13476219,  -- Horizontal Prediction
+            enemy.Velocity.Y * 0.13712945,  -- Vertical Prediction
+            enemy.Velocity.Z * 0.13192     -- General Prediction
+        ))
+    end
+end)
+
+-- UI Setup for Camlock Button
 local CamlockButton = Instance.new("TextButton")
+local ZiedUI = Instance.new("ScreenGui")
 
-LockUI.Name = "LockScript"
-LockUI.Parent = game.CoreGui
-LockUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ZiedUI.Name = "Zied"
+ZiedUI.Parent = game.CoreGui
+ZiedUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-CamlockButton.Parent = LockUI
+CamlockButton.Parent = ZiedUI
 CamlockButton.Position = UDim2.new(0.05, 0, 0.2, 0)
 CamlockButton.Size = UDim2.new(0, 120, 0, 50)
 CamlockButton.Text = "Z LOCK [OFF]"
 CamlockButton.Font = Enum.Font.GothamBold
 CamlockButton.TextSize = 20
-CamlockButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black
+CamlockButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 CamlockButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CamlockButton.BorderSizePixel = 2
 CamlockButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
@@ -79,7 +91,7 @@ CamlockButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Aimbot Lock Update
-RunService.Heartbeat:Connect(function()
-    if CamlockState and enemy then
-        local camera = workspace.CurrentCamera
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Zied.lua Loaded",
+    Text = "Camlock functionality loaded successfully."
+})
