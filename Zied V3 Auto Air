@@ -1,0 +1,56 @@
+-- Auto Air Script (Independent)
+
+getgenv().AutoAir = {
+    ["Enabled"] = false,
+    ["AirDelay"] = 0.2
+}
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+
+local AutoAirState = false
+local enemy = nil
+
+-- Auto Air Button UI
+local AutoAirUI = Instance.new("ScreenGui")
+local AutoAirButton = Instance.new("TextButton")
+
+AutoAirUI.Name = "AutoAirScript"
+AutoAirUI.Parent = game.CoreGui
+AutoAirUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+AutoAirButton.Parent = AutoAirUI
+AutoAirButton.Position = UDim2.new(0.05, 0, 0.3, 0)
+AutoAirButton.Size = UDim2.new(0, 120, 0, 50)
+AutoAirButton.Text = "AUTO AIR [OFF]"
+AutoAirButton.Font = Enum.Font.GothamBold
+AutoAirButton.TextSize = 20
+AutoAirButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black
+AutoAirButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoAirButton.BorderSizePixel = 2
+AutoAirButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+AutoAirButton.Active = true
+AutoAirButton.Draggable = true
+
+AutoAirButton.MouseButton1Click:Connect(function()
+    AutoAirState = not AutoAirState
+    AutoAirButton.Text = AutoAirState and "AUTO AIR [ON]" or "AUTO AIR [OFF]"
+end)
+
+-- Auto Air Functionality
+RunService.Heartbeat:Connect(function()
+    if AutoAirState and enemy then
+        if enemy.Velocity.Y > 30 then
+            task.wait(AutoAir.AirDelay)
+            local Character = LocalPlayer.Character
+            if Character then
+                local Tool = Character:FindFirstChildOfClass("Tool")
+                if Tool then
+                    Tool:Activate()
+                end
+            end
+        end
+    end
+end)
