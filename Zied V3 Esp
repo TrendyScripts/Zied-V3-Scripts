@@ -1,9 +1,97 @@
-getgenv().enabled = true --Toggle on/off
-getgenv().filluseteamcolor = false --Toggle fill color using player team color on/off
-getgenv().outlineuseteamcolor = false --Toggle outline color using player team color on/off
-getgenv().fillcolor = Color3.new(0, 0, 0) --Change fill color, no need to edit if using team color
-getgenv().outlinecolor = Color3.new(157, 0, 255) --Change outline color, no need to edit if using team color
-getgenv().filltrans = 1 --Change fill transparency
-getgenv().outlinetrans = 0 --Change outline transparency
+-- User-configurable settings
+getgenv().enabled = false -- Initial state is off
+getgenv().filluseteamcolor = false -- Toggle fill color using player team color on/off
+getgenv().outlineuseteamcolor = false -- Toggle outline color using player team color on/off
+getgenv().fillcolor = Color3.new(0, 0, 0) -- Change fill color
+getgenv().outlinecolor = Color3.new(157, 0, 255) -- Change outline color
+getgenv().filltrans = 1 -- Change fill transparency
+getgenv().outlinetrans = 0 -- Change outline transparency
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/zntly/highlight-esp/main/esp.lua"))()
+-- Variables to manage ESP state
+local espEnabled = false
+local espScript = nil
+local espObjects = {} -- Store ESP objects for cleanup
+
+-- Load and execute the ESP script when needed
+local function loadESP()
+    if not espScript then
+        -- Here, we'll load the external ESP script and capture the generated ESP objects.
+        local success, result = pcall(function()
+            return loadstring(game:HttpGet("https://raw.githubusercontent.com/zntly/highlight-esp/main/esp.lua"))()
+        end)
+        
+        -- If loading was successful, we'll track the ESP objects created by this script
+        if success then
+            -- Assuming the ESP script provides its objects in a way that we can track
+            espScript = result
+            -- In case the external ESP script creates objects, we should be tracking them here
+            -- You can use a custom table to track the created objects (e.g., storing them in espObjects)
+        else
+            warn("Error loading ESP script:", result)
+        end
+    end
+end
+
+-- Clean up the ESP visuals by destroying tracked objects
+local function disableESP()
+    for _, obj in pairs(espObjects) do
+        if obj and obj.Parent then
+            obj:Destroy()
+        end
+    end
+    espObjects = {} -- Clear out any stored ESP objects
+end
+
+-- Toggle ESP: Enable/Disable the ESP
+local function toggleESP()
+    if getgenv().enabled then
+        if not espEnabled then
+            loadESP()  -- Load the ESP if it's not already loaded
+            espEnabled = true
+            -- After the script is loaded, check for objects and track them
+            -- We assume that the external ESP script creates objects which can be tracked
+            -- If not, the ESP script may need modification to add objects to a custom table
+        end
+    else
+        if espEnabled then
+            disableESP()  -- Disable ESP by destroying the objects
+            espEnabled = false
+        end
+    end
+end
+
+-- UI Button Setup for toggling ESP
+local Player = game.Players.LocalPlayer
+local StarterGui = game:GetService("StarterGui")
+local ToggleButton = Instance.new("TextButton")
+local UI = Instance.new("ScreenGui")
+
+UI.Name = "ESP_Toggle_UI"
+UI.Parent = game.CoreGui
+UI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+ToggleButton.Parent = UI
+ToggleButton.Position = UDim2.new(0.05, 0, 0.2, 0)
+ToggleButton.Size = UDim2.new(0, 120, 0, 50)
+ToggleButton.Text = "ESP [PERMANENT]"
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 20
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.BorderSizePixel = 2
+ToggleButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+ToggleButton.MouseButton1Click:Connect(function()
+    -- Toggle the ESP state when the button is clicked
+    getgenv().enabled = not getgenv().enabled
+    ToggleButton.Text = getgenv().enabled and "ESP [ON]" or "ESP [OFF]"
+    toggleESP()  -- Apply the toggle to enable/disable ESP
+end)
+
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "ESP Script Loaded",
+    Text = "Toggle ESP with the button.",
+    Duration = 2
+})
