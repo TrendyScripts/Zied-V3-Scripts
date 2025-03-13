@@ -48,9 +48,9 @@ RunService.Heartbeat:Connect(function()
     if CamlockState and enemy then
         local camera = workspace.CurrentCamera
         camera.CFrame = CFrame.new(camera.CFrame.p, enemy.Position + Vector3.new(
-            enemy.Velocity.X * 0.11,  -- Horizontal Prediction
-            enemy.Velocity.Y * 0.11,  -- Vertical Prediction
-            enemy.Velocity.Z * 0.11     -- General Prediction
+            enemy.Velocity.X * 0.1007,  -- Horizontal Prediction
+            enemy.Velocity.Y * 0.120,  -- Vertical Prediction
+            enemy.Velocity.Z * 0.14644     -- General Prediction
         ))
     end
 end)
