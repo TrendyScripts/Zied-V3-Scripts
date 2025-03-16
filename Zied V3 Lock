@@ -1,4 +1,12 @@
--- Camlock Script
+getgenv().Zied = {
+    Prediction = 0.070,
+    HorizontalPrediction = 0.080,
+    VerticalPrediction = 0.090,
+    Smoothness = 0.7,
+    AirDelay = 0.150,
+    AimPart = "UpperTorso",
+    ToggleKey = "q",
+}
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -10,9 +18,9 @@ local enemy = nil
 
 local function Notify(title, text)
     StarterGui:SetCore("SendNotification", {
-        Title = title;
-        Text = text;
-        Duration = 2;
+        Title = title,
+        Text = text,
+        Duration = 2,
     })
 end
 
@@ -48,14 +56,13 @@ RunService.Heartbeat:Connect(function()
     if CamlockState and enemy then
         local camera = workspace.CurrentCamera
         camera.CFrame = CFrame.new(camera.CFrame.p, enemy.Position + Vector3.new(
-            enemy.Velocity.X * 0.1007,  -- Horizontal Prediction
-            enemy.Velocity.Y * 0.120,  -- Vertical Prediction
-            enemy.Velocity.Z * 0.14644     -- General Prediction
-        ))
+            enemy.Velocity.X * getgenv().Zied.HorizontalPrediction,
+            enemy.Velocity.Y * getgenv().Zied.VerticalPrediction,
+            enemy.Velocity.Z * getgenv().Zied.Prediction
+        )):Lerp(camera.CFrame, getgenv().Zied.Smoothness)
     end
 end)
 
--- UI Setup for Camlock Button
 local CamlockButton = Instance.new("TextButton")
 local ZiedUI = Instance.new("ScreenGui")
 
@@ -93,5 +100,5 @@ end)
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "Zied.lua Loaded",
-    Text = "Camlock functionality loaded successfully."
+    Text = "Zied.lua loaded successfully."
 })
