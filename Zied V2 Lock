@@ -1,7 +1,7 @@
 getgenv().Zied = {
-    Prediction = 0.070,
-    HorizontalPrediction = 0.080,
-    VerticalPrediction = 0.090,
+    Prediction = 0.1632049827,
+    HorizontalPrediction = 0.145674112345,
+    VerticalPrediction = 0.12828687172849,
     Smoothness = 0.7,
     AirDelay = 0.150,
     AimPart = "UpperTorso",
